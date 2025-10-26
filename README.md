@@ -66,27 +66,45 @@ This project explores two different machine learning paradigms for loan approval
 
 ### 1. Deep Learning Model (MLP)
 
-- Metrics on test set:
-  - **AUC:** 0.714  
-  - **F1-score:** 0.666  
-- Classification report shows balanced precision and recall for both classes.  
+- Initially trained on raw dataset without sampling:
+  - **Issue:** One class accuracy ~89%, the other ~1%; extremely imbalanced predictions.
+- After sampling and balancing the dataset with a larger number of samples:
+  - Accuracy for both 0 and 1 target classes stabilized around **66%**
+  - F1-score ~0.667
 
-*Interpretation:*  
-The DL model discriminates reasonably well between defaulted and fully paid loans. AUC measures separability, while F1-score balances false positives and false negatives.
+*Observation:* Balanced data improved performance, but F1-score was still moderate.
+
+### 2. TabNet for Tabular Data
+
+- Switched to **TabNet** to further improve F1-score and overall accuracy.  
+- TabNet is chosen because:
+  - It effectively handles tabular data with mixed numeric and categorical features.
+  - Captures complex feature interactions automatically.
+  - Provides interpretable attention masks for feature importance.
+
+**Result:**  
+
+- Accuracy for both 0 and 1 target classes increased to **~94%**  
+- F1-score improved significantly, achieving a more balanced classification performance.
+
+*Challenges and Adjustments:*  
+- Handled NaNs and infinities carefully using median replacement.  
+- Adjusted TabNet hyperparameters: `n_d`, `n_a`, `n_steps`, `learning_rate`, and `batch_size`.  
+- Resolved version issues with constructor parameters and `.fit()` method.  
 
 ---
 
-### 2. Offline RL Agent (DQN)
+### 3. Offline RL Agent (DQN)
 
 - **Estimated Policy Value:** 96.26  
-- Trained using historical data, with the environment designed to reward approvals of good loans and penalize losses from defaults.  
+- Trained using historical data, rewarding approvals of good loans and penalizing losses from defaults.  
 
 *Interpretation:*  
 The RL agent optimizes for long-term financial reward rather than classification accuracy. The policy learned balances risk and potential profit effectively.
 
 ---
 
-### 3. Comparison of Policies
+### 4. Comparison of Policies
 
 - **DL Model Policy:** Approve if predicted default probability < 0.5 (conservative approach).  
 - **RL Agent Policy:** Approves loans based on expected reward considering interest vs. default risk (strategic profit-aware approach).  
@@ -111,7 +129,7 @@ The RL agent optimizes for long-term financial reward rather than classification
 
 ## Final Thoughts
 
-- **Deep Learning Model:** Risk-aware, focuses on minimizing defaults.  
+- **Deep Learning Model (MLP / TabNet):** Risk-aware, focuses on minimizing defaults; TabNet improves overall accuracy and F1-score.  
 - **Offline RL Agent:** Profit-aware, focuses on maximizing long-term financial return.  
 - **Hybrid approach:** Combining both could lead to intelligent, fair, and financially optimized lending decisions.
 
@@ -122,7 +140,7 @@ The RL agent optimizes for long-term financial reward rather than classification
 - `accepted_2007_to_2018Q4.csv` – Raw LendingClub data  
 - `mlp_lendingclub_model.h5` – Trained deep learning model  
 - `mlp_lendingclub_balanced.h5` – Trained balanced MLP  
+- `tabnet_lendingclub_model.zip` – Trained TabNet model  
 - `scaler.joblib` / `scaler_balanced.joblib` – Feature scalers  
 - `dqn_lendingclub_agent.zip` – Trained RL agent  
 - `model_analysis.ipynb` - Jupyter Notebook (contains whole code)
----
